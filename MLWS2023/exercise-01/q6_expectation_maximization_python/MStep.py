@@ -20,4 +20,19 @@ def MStep(gamma, X):
     # covariances    : Covariance matrices for each component(DxDxK).
 
     #####Insert your code here for subtask 6c#####
+    N,K = gamma.shape
+    # X = np.array(X)
+    # gamma = np.array(gamma)
+    D = X.shape[1]
+    N_j=gamma.sum(axis = 0, keepdims = True)
+    weights = np.squeeze(N_j/N)
+
+    means = (gamma.T @ X)/(N_j.T )  #shape (KxD)
+    covariances = np.zeros((D,D,K))
+
+    for i in range(K):
+        covariances[:, :, i] = np.dot((gamma[:, i] * (X - means[i]).T), (X - means[i])) / N_j[0, i]
+
+
+    logLikelihood = getLogLikelihood(means= means, weights= weights, covariances= covariances, X=X)
     return weights, means, covariances, logLikelihood
