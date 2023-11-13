@@ -19,4 +19,24 @@ def skinDetection(ndata, sdata, K, n_iter, epsilon, theta, img):
     # result        : Result of the detector for every image pixel
 
     #####Insert your code here for subtask 1g#####
+    height, width = img.shape[0], img.shape[1]
+    skin = np.zeros((height,width))
+    noSkin = np.zeros((height,width))
+
+
+    s_weights, s_means, s_covariances= estGaussMixEM(sdata, K, n_iter, epsilon)
+   
+
+    n_weights, n_means, n_covariances= estGaussMixEM(ndata, K, n_iter, epsilon)
+    
+
+    for i in range(height):
+        for j in range(width):
+            skin[i,j] = getLogLikelihood(s_means, s_weights, s_covariances, img[i,j])
+            noSkin[i,j] = getLogLikelihood(n_means, n_weights, n_covariances, img[i,j])
+            
+
+    likelihood_ratio = np.exp(skin-noSkin)
+    result = np.where(likelihood_ratio > theta,1,0) 
+
     return result
