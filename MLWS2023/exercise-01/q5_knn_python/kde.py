@@ -11,4 +11,10 @@ def kde(samples, h):
 
     #####Insert your code here for subtask 5a#####
     # Compute the number of samples created
+    N = len(samples)
+    pos = np.arange(-5,5.0,0.1).reshape((-1,1))
+    kernel = np.exp(-0.5*((pos-samples.reshape((-1,N)))/(h))**2)/np.sqrt(2*np.pi*h**2)
+    prob = np.sum(kernel, axis =1, keepdims=True)/N
+    estDensity = np.hstack((pos, prob))
+
     return estDensity
