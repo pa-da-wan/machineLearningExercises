@@ -16,17 +16,44 @@ def getLogLikelihood(means, weights, covariances, X):
 
     #####Insert your code here for subtask 6a#####
 
-    K,D = np.array(means).shape
-    N = X.shape[0]
+    # K,D = np.array(means).shape
+    # N = X.shape[0]
+    
+    # logLikelihood=0
+    # for n in range(N):
+    #     weighted_gauss = 0
+    #     for i in range(K):
+    #         exponent = (X[n]-means[i])@np.linalg.inv(covariances[:,:,i])@(X[n]-means[i]).T
+    #         base = (((2*np.pi)**(D/2))*np.sqrt(np.linalg.det(covariances[:,:,i])))
+    #         weight = np.array(weights).reshape((1,-1))[0,i]
+    #         weighted_gauss+= weight*np.exp(-0.5*exponent)/base
+    #     logLikelihood+= np.log(weighted_gauss)
+
+    K = np.array(weights).reshape((1,-1)).shape[1]
+
+    if len(X.shape) > 1:
+        N,D = np.array(X).shape
+    else:
+        N = 1
+        D = X.shape[0]
     
     logLikelihood=0
     for n in range(N):
         weighted_gauss = 0
         for i in range(K):
-            exponent = (X[n]-means[i])@np.linalg.inv(covariances[:,:,i])@(X[n]-means[i]).T
-            base = (((2*np.pi)**(D/2))*np.sqrt(np.linalg.det(covariances[:,:,i])))
+
+            if N == 1:
+                meansDiff = X - means[i]
+            else:
+                meansDiff = X[n,:] - means[i]
+            
+            covariance = covariances[:, :, i].copy()
+            numerator = np.exp(-0.5*(meansDiff)@np.linalg.inv(covariance)@(meansDiff).T)
+            norm = 1. / float(((2 * np.pi) ** (float(D) / 2.)) * np.sqrt(np.linalg.det(covariance)))
+
             weight = np.array(weights).reshape((1,-1))[0,i]
-            weighted_gauss+= weight*np.exp(-0.5*exponent)/base
+            
+            weighted_gauss+= weight*numerator*norm
         logLikelihood+= np.log(weighted_gauss)
     return logLikelihood
 
